@@ -1,1 +1,48 @@
-Jenkins
+node {
+   def mvnHome
+   def pom
+   stage('Preparation') { // for display purposes
+      // Get some code from a GitHub repository
+      git 'https://github.com/formation2018/repository_formation.git'
+      // Get the Maven tool.
+      // ** NOTE: This 'M3' Maven tool must be configured
+      // **       in the global configuration.           
+      mvnHome = tool 'MAVEN 3'
+      pom = readMavenPom file: 'pom.xml'
+   }
+   stage('Build') {
+      // Run the maven build
+      if (isUnix()) {
+         sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package"
+      } else {
+         bat(/"${mvnHome}\bin\mvn" -B -DskipTests -Dmaven.test.failure.ignore clean package/)
+      }
+   }
+   stage('Test') {
+      if (isUnix()) {
+         sh "'${mvnHome}/bin/mvn' test"
+      } else {
+         bat(/"${mvnHome}\bin\mvn" -Dmaven.main.skip test/)
+      }
+   }
+   stage('Results') {
+      junit '**/target/surefire-reports/TEST-*.xml'
+      archiveArtifacts 'target/*.jar'
+   }
+   stage('Publish Artefact') {
+      if (isUnix()) {
+         sh "'${mvnHome}/bin/mvn' -DdeployOnly deploy"
+      } else {
+         bat(/"${mvnHome}\bin\mvn" -Dmaven.main.skip -DskipTests deploy -s "C:\integ_continue\apache-maven-3.5.3-bin\conf\settings.xml"/)
+      }
+   }
+   stage('Execute Jar') {
+       if (isUnix()) {
+           sh "java -jar target/*.jar"
+       } else {
+         //bat(/java -jar target\/training-app-1.0-SNAPSHOT-jar-with-dependencies.jar/)
+           bat(/java -jar target\/${pom.artifactId}-${pom.version}-jar-with-dependencies.${pom.packaging}/)
+       }
+   }
+}
+
