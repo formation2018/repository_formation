@@ -32,12 +32,12 @@
       <version>5.1.35</version>
     </dependency>
   </dependencies>
-  <scm>
+<!--   <scm>
     <connection>scm:git:https://github.com/formation2018/repository_formation.git</connection>
     <developerConnection>scm:git:https://github.com/formation2018/repository_formation.git</developerConnection>
     <url>https://github.com/formation2018/repository_formation.git</url>
     <tag>master</tag>
-  </scm>
+  </scm> -->
   <build>
     <plugins>
       <plugin>
@@ -96,15 +96,20 @@
         </executions>
       </plugin>
 
-      <plugin>
+ <!--      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-scm-plugin</artifactId>
         <version>1.10.0</version>
         <configuration>
           <goals>install</goals>
         </configuration>
-      </plugin>
+      </plugin> -->
 
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.4.0.905</version>
+      </plugin>
     </plugins>
   </build>
 </project>
